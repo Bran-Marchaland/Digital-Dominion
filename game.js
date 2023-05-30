@@ -1,7 +1,7 @@
 var HP = 11;
 var input;
-var isLeftButtonDown = false;
 var isRightButtonDown = false;
+var isLeftButtonDown = false;
 var distanceY;
 var distanceX;
 var surchauffe = 0;
@@ -13,6 +13,8 @@ class partie_1 extends Phaser.Scene {
     constructor() {
         super('partie_1');
         this.canshootA1 = true
+        this.isLeftButtonDown = false;
+
     }
 
     preload() {
@@ -27,6 +29,8 @@ class partie_1 extends Phaser.Scene {
         this.load.image('tourelle', 'sprites/tourelle.png');
         this.load.image('porteS1', 'sprites/porte_simple_1.png');
         this.load.image('porteS2', 'sprites/porte_simple_2.png');
+        this.load.image('TP1', 'maps/TP.png');
+
         this.load.image('generateur', 'sprites/generateur.png');
         this.load.image('HBZM', 'sprites/hb_z_m.png');
         this.load.image('porteL', 'sprites/porte_lourd.png');
@@ -51,7 +55,7 @@ class partie_1 extends Phaser.Scene {
         const tileset = carteDuNiveau.addTilesetImage("test", "phaser_assets");
         const base = carteDuNiveau.createLayer('map', tileset);
         base.setCollisionByProperty({ estSolide: true });
-        this.player = this.physics.add.sprite(109 * 64, 19 * 64, 'perso');
+        this.player = this.physics.add.sprite(16 * 64, 8 * 64, 'perso');
         this.physics.add.collider(this.player, base);
         this.cameras.main.zoom = 0.2;
         //this.cameras.main.startFollow(this.player);
@@ -62,27 +66,22 @@ class partie_1 extends Phaser.Scene {
         this.surchauffeV = this.add.sprite(-1650, 1000, 'surchauffe').setScale(12.8).setScrollFactor(0);
         this.surchauffeV.depth = 1000
         this.vie.depth = 1000
-        this.input.on('pointerdown', (pointer) => {
-
-            isLeftButtonDown = true;
-
-        });
-
-        this.input.on('pointerup', (pointer) => {
-
-            isLeftButtonDown = false;
-
-        });
 
         this.input.on('pointerdown', (pointer) => {
             if (pointer.rightButtonDown()) {
                 isRightButtonDown = true;
+            }
+            if (pointer.leftButtonDown()) {
+                isLeftButtonDown = true;
             }
         });
 
         this.input.on('pointerup', (pointer) => {
             if (!pointer.rightButtonDown()) {
                 isRightButtonDown = false;
+            }
+            if (!pointer.leftButtonDown()) {
+                isLeftButtonDown = false;
             }
         });
 
@@ -237,6 +236,9 @@ class partie_1 extends Phaser.Scene {
 
 
 
+        this.tp = this.physics.add.image(197 * 64, 111 * 64, 'TP1')
+
+
         /////////////////////////////////PLATEFORME\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
         this.plateforme_1 = this.physics.add.image(142 * 64, 121.5 * 64, 'plateforme')
             .setImmovable(true)
@@ -251,16 +253,24 @@ class partie_1 extends Phaser.Scene {
 
 
 
-        this.projectile_tourelle = this.physics.add.group()
+        this.projectile_tourelle = this.physics.add.group();
 
         /////////////////////////////////ENEMIES\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
         this.robot = this.physics.add.group()
         this.robot.create(53 * 64, 39.5 * 64, 'tourelle').setVelocityX(-400);         //1
         this.robot.create(104 * 64, 25.5 * 64, 'tourelle').setVelocityX(-200);         //2
         this.robot.create(133 * 64, 13.5 * 64, 'tourelle').setVelocityX(-100);         //3
-        this.robot.create(154 * 64, 13.5 * 64, 'tourelle').setVelocityX(-100);         //4
+        this.robot.create(154 * 64, 13.5 * 64, 'tourelle').setVelocityX(100);         //4
         this.robot.create(147 * 64, 39.5 * 64, 'tourelle').setVelocityX(-100);         //5
-
+        this.robot.create(98 * 64, 39.5 * 64, 'tourelle').setVelocityX(-100);         //6
+        this.robot.create(89 * 64, 104.5 * 64, 'tourelle').setVelocityX(-100);         //7
+        this.robot.create(107 * 64, 102.5 * 64, 'tourelle').setVelocityX(-100);         //8
+        this.robot.create(40 * 64, 176.5 * 64, 'tourelle').setVelocityX(300);         //9
+        this.robot.create(50 * 64, 176.5 * 64, 'tourelle').setVelocityX(-100);         //10
+        this.robot.create(73 * 64, 189.5 * 64, 'tourelle').setVelocityX(-100);         //11
+        this.robot.create(99 * 64, 189.5 * 64, 'tourelle').setVelocityX(-100);         //12
+        this.robot.create(80 * 64, 176.5 * 64, 'tourelle').setVelocityX(-100);         //13
+        this.robot.create(93 * 64, 176.5 * 64, 'tourelle').setVelocityX(-100);         //14
 
 
 
@@ -400,6 +410,26 @@ class partie_1 extends Phaser.Scene {
         this.robot.getChildren()[2].canshoot = true;
         this.robot.getChildren()[3].vierobot = 4;
         this.robot.getChildren()[3].canshoot = true;
+        this.robot.getChildren()[4].vierobot = 4;
+        this.robot.getChildren()[4].canshoot = true;
+        this.robot.getChildren()[5].vierobot = 4;
+        this.robot.getChildren()[5].canshoot = true;
+        this.robot.getChildren()[6].vierobot = 4;
+        this.robot.getChildren()[6].canshoot = true;
+        this.robot.getChildren()[7].vierobot = 4;
+        this.robot.getChildren()[7].canshoot = true;
+        this.robot.getChildren()[8].vierobot = 4;
+        this.robot.getChildren()[8].canshoot = true;
+        this.robot.getChildren()[9].vierobot = 4;
+        this.robot.getChildren()[9].canshoot = true;
+        this.robot.getChildren()[10].vierobot = 4;
+        this.robot.getChildren()[10].canshoot = true;
+        this.robot.getChildren()[11].vierobot = 4;
+        this.robot.getChildren()[11].canshoot = true;
+        this.robot.getChildren()[12].vierobot = 4;
+        this.robot.getChildren()[12].canshoot = true;
+        this.robot.getChildren()[13].vierobot = 4;
+        this.robot.getChildren()[13].canshoot = true;
         /////////////////////////////////COLISION\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
         this.physics.add.collider(this.tourelle, base);
@@ -419,7 +449,7 @@ class partie_1 extends Phaser.Scene {
         this.physics.add.collider(this.tir_player, this.generateur_4, this.DG, null, this)
         this.physics.add.collider(this.tir_player, this.generateur_5, this.DG, null, this)
         this.physics.add.collider(this.robot, base)
-
+        this.physics.add.collider(this.player,this.tp,this.P2,null,this);
         this.physics.add.collider(this.heal, base, this.DG, null, this)
         this.physics.add.overlap(this.robot, this.GRPHBZM, this.MR, null, this)
         this.physics.add.collider(this.tir_player, this.generateur_6, this.DG, null, this)
@@ -918,10 +948,12 @@ class partie_1 extends Phaser.Scene {
     update() {
         let angle = Phaser.Math.Angle.Between(this.arme.x, this.arme.y, this.input.activePointer.worldX, this.input.activePointer.worldY);
         this.arme.setRotation(angle);
+        console.log(this.isLeftButtonDown)
 
 
-        if (isLeftButtonDown && this.canshootA1) {
+        if (isLeftButtonDown && this.canshootA1 ) {
             //this.point.normalize()
+            console.log(this.canshootA1)
             this.tir_player.create(this.player.x, this.player.y, "tire_p_A_1")
                 .setVelocityX(Math.cos(angle) * 7500)
                 .setVelocityY(Math.sin(angle) * 7500)
@@ -1502,8 +1534,6 @@ class partie_1 extends Phaser.Scene {
                     }, 1800);
                 }
             }
-
-
         }
 
         if (this.tourelle.getChildren()[38]) {
@@ -1544,6 +1574,162 @@ class partie_1 extends Phaser.Scene {
                 }
             }
         }
+        if (this.robot.getChildren()[2]) {
+            const distance42 = Phaser.Math.Distance.Between(this.robot.getChildren()[2].x, this.robot.getChildren()[2].y, this.player.x, this.player.y);
+            if (distance42 < 3000) {
+                if (this.robot.getChildren()[2].canshoot == true) {
+                    this.projectile_tourelle.create(this.robot.getChildren()[2].x, this.robot.getChildren()[2].y, "lazzzzzer").setVelocityX(this.player.x - this.robot.getChildren()[2].x).setVelocityY(this.player.y - this.robot.getChildren()[2].y).body.setAllowGravity(false)
+                    this.robot.getChildren()[2].canshoot = false
+                    setTimeout(() => {
+                        this.robot.getChildren()[2].canshoot = true
+                    }, 1800);
+                }
+            }
+        }
+
+        if (this.robot.getChildren()[3]) {
+            const distance43 = Phaser.Math.Distance.Between(this.robot.getChildren()[3].x, this.robot.getChildren()[3].y, this.player.x, this.player.y);
+            if (distance43 < 3000) {
+                if (this.robot.getChildren()[3].canshoot == true) {
+                    this.projectile_tourelle.create(this.robot.getChildren()[3].x, this.robot.getChildren()[3].y, "lazzzzzer").setVelocityX(this.player.x - this.robot.getChildren()[3].x).setVelocityY(this.player.y - this.robot.getChildren()[3].y).body.setAllowGravity(false)
+                    this.robot.getChildren()[3].canshoot = false
+                    setTimeout(() => {
+                        this.robot.getChildren()[3].canshoot = true
+                    }, 1800);
+                }
+            }
+        }
+
+        if (this.robot.getChildren()[4]) {
+            const distance44 = Phaser.Math.Distance.Between(this.robot.getChildren()[4].x, this.robot.getChildren()[4].y, this.player.x, this.player.y);
+            if (distance44 < 3000) {
+                if (this.robot.getChildren()[4].canshoot == true) {
+                    this.projectile_tourelle.create(this.robot.getChildren()[4].x, this.robot.getChildren()[4].y, "lazzzzzer").setVelocityX(this.player.x - this.robot.getChildren()[4].x).setVelocityY(this.player.y - this.robot.getChildren()[4].y).body.setAllowGravity(false)
+                    this.robot.getChildren()[4].canshoot = false
+                    setTimeout(() => {
+                        this.robot.getChildren()[4].canshoot = true
+                    }, 1800);
+                }
+            }
+        }
+
+        if (this.robot.getChildren()[5]) {
+            const distance45 = Phaser.Math.Distance.Between(this.robot.getChildren()[5].x, this.robot.getChildren()[5].y, this.player.x, this.player.y);
+            if (distance45 < 3000) {
+                if (this.robot.getChildren()[5].canshoot == true) {
+                    this.projectile_tourelle.create(this.robot.getChildren()[5].x, this.robot.getChildren()[5].y, "lazzzzzer").setVelocityX(this.player.x - this.robot.getChildren()[5].x).setVelocityY(this.player.y - this.robot.getChildren()[5].y).body.setAllowGravity(false)
+                    this.robot.getChildren()[5].canshoot = false
+                    setTimeout(() => {
+                        this.robot.getChildren()[5].canshoot = true
+                    }, 1800);
+                }
+            }
+        }
+
+        if (this.robot.getChildren()[6]) {
+            const distance46 = Phaser.Math.Distance.Between(this.robot.getChildren()[6].x, this.robot.getChildren()[6].y, this.player.x, this.player.y);
+            if (distance46 < 3000) {
+                if (this.robot.getChildren()[6].canshoot == true) {
+                    this.projectile_tourelle.create(this.robot.getChildren()[6].x, this.robot.getChildren()[6].y, "lazzzzzer").setVelocityX(this.player.x - this.robot.getChildren()[6].x).setVelocityY(this.player.y - this.robot.getChildren()[6].y).body.setAllowGravity(false)
+                    this.robot.getChildren()[6].canshoot = false
+                    setTimeout(() => {
+                        this.robot.getChildren()[6].canshoot = true
+                    }, 1800);
+                }
+            }
+        }
+
+        if (this.robot.getChildren()[7]) {
+            const distance47 = Phaser.Math.Distance.Between(this.robot.getChildren()[7].x, this.robot.getChildren()[7].y, this.player.x, this.player.y);
+            if (distance47 < 3000) {
+                if (this.robot.getChildren()[7].canshoot == true) {
+                    this.projectile_tourelle.create(this.robot.getChildren()[7].x, this.robot.getChildren()[7].y, "lazzzzzer").setVelocityX(this.player.x - this.robot.getChildren()[7].x).setVelocityY(this.player.y - this.robot.getChildren()[7].y).body.setAllowGravity(false)
+                    this.robot.getChildren()[7].canshoot = false
+                    setTimeout(() => {
+                        this.robot.getChildren()[7].canshoot = true
+                    }, 1800);
+                }
+            }
+        }
+
+        if (this.robot.getChildren()[8]) {
+            const distance48 = Phaser.Math.Distance.Between(this.robot.getChildren()[8].x, this.robot.getChildren()[8].y, this.player.x, this.player.y);
+            if (distance48 < 3000) {
+                if (this.robot.getChildren()[8].canshoot == true) {
+                    this.projectile_tourelle.create(this.robot.getChildren()[8].x, this.robot.getChildren()[8].y, "lazzzzzer").setVelocityX(this.player.x - this.robot.getChildren()[8].x).setVelocityY(this.player.y - this.robot.getChildren()[8].y).body.setAllowGravity(false)
+                    this.robot.getChildren()[8].canshoot = false
+                    setTimeout(() => {
+                        this.robot.getChildren()[8].canshoot = true
+                    }, 1800);
+                }
+            }
+        }
+
+        if (this.robot.getChildren()[9]) {
+            const distance49 = Phaser.Math.Distance.Between(this.robot.getChildren()[9].x, this.robot.getChildren()[9].y, this.player.x, this.player.y);
+            if (distance49 < 3000) {
+                if (this.robot.getChildren()[9].canshoot == true) {
+                    this.projectile_tourelle.create(this.robot.getChildren()[9].x, this.robot.getChildren()[9].y, "lazzzzzer").setVelocityX(this.player.x - this.robot.getChildren()[9].x).setVelocityY(this.player.y - this.robot.getChildren()[9].y).body.setAllowGravity(false)
+                    this.robot.getChildren()[9].canshoot = false
+                    setTimeout(() => {
+                        this.robot.getChildren()[9].canshoot = true
+                    }, 1800);
+                }
+            }
+        }
+
+        if (this.robot.getChildren()[10]) {
+            const distance50 = Phaser.Math.Distance.Between(this.robot.getChildren()[10].x, this.robot.getChildren()[10].y, this.player.x, this.player.y);
+            if (distance50 < 3000) {
+                if (this.robot.getChildren()[10].canshoot == true) {
+                    this.projectile_tourelle.create(this.robot.getChildren()[10].x, this.robot.getChildren()[10].y, "lazzzzzer").setVelocityX(this.player.x - this.robot.getChildren()[10].x).setVelocityY(this.player.y - this.robot.getChildren()[10].y).body.setAllowGravity(false)
+                    this.robot.getChildren()[10].canshoot = false
+                    setTimeout(() => {
+                        this.robot.getChildren()[10].canshoot = true
+                    }, 1800);
+                }
+            }
+        }
+
+        if (this.robot.getChildren()[11]) {
+            const distance51 = Phaser.Math.Distance.Between(this.robot.getChildren()[11].x, this.robot.getChildren()[11].y, this.player.x, this.player.y);
+            if (distance51 < 3000) {
+                if (this.robot.getChildren()[11].canshoot == true) {
+                    this.projectile_tourelle.create(this.robot.getChildren()[11].x, this.robot.getChildren()[11].y, "lazzzzzer").setVelocityX(this.player.x - this.robot.getChildren()[11].x).setVelocityY(this.player.y - this.robot.getChildren()[11].y).body.setAllowGravity(false)
+                    this.robot.getChildren()[11].canshoot = false
+                    setTimeout(() => {
+                        this.robot.getChildren()[11].canshoot = true
+                    }, 1800);
+                }
+            }
+        }
+
+        if (this.robot.getChildren()[12]) {
+            const distance52= Phaser.Math.Distance.Between(this.robot.getChildren()[12].x, this.robot.getChildren()[12].y, this.player.x, this.player.y);
+            if (distance52 < 3000) {
+                if (this.robot.getChildren()[12].canshoot == true) {
+                    this.projectile_tourelle.create(this.robot.getChildren()[12].x, this.robot.getChildren()[12].y, "lazzzzzer").setVelocityX(this.player.x - this.robot.getChildren()[12].x).setVelocityY(this.player.y - this.robot.getChildren()[12].y).body.setAllowGravity(false)
+                    this.robot.getChildren()[12].canshoot = false
+                    setTimeout(() => {
+                        this.robot.getChildren()[12].canshoot = true
+                    }, 1800);
+                }
+            }
+        }
+
+        if (this.robot.getChildren()[13]) {
+            const distance53= Phaser.Math.Distance.Between(this.robot.getChildren()[13].x, this.robot.getChildren()[13].y, this.player.x, this.player.y);
+            if (distance53 < 3000) {
+                if (this.robot.getChildren()[13].canshoot == true) {
+                    this.projectile_tourelle.create(this.robot.getChildren()[13].x, this.robot.getChildren()[13].y, "lazzzzzer").setVelocityX(this.player.x - this.robot.getChildren()[13].x).setVelocityY(this.player.y - this.robot.getChildren()[13].y).body.setAllowGravity(false)
+                    this.robot.getChildren()[13].canshoot = false
+                    setTimeout(() => {
+                        this.robot.getChildren()[13].canshoot = true
+                    }, 1800);
+                }
+            }
+        }
+        
         //const distance26 = Phaser.Math.Distance.Between(this.tourelle.getChildren()[25].x, this.tourelle.getChildren()[25].y, this.player.x, this.player.y);
 
 
