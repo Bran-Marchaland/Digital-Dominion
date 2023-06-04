@@ -88,7 +88,7 @@ class partie_1 extends Phaser.Scene {
         this.sonB.loop = true;
         this.sonMarche.loop = true;
         this.sonB.volume = 0.9;
-        this.sonB.volume = 10;
+        
 
 
 
@@ -2400,7 +2400,7 @@ class partie_2 extends Phaser.Scene {
         this.sonB.loop = true;
         this.sonMarche.loop = true;
         this.sonB.volume = 0.9;
-        this.sonB.volume = 10;
+        
 
 
         /////////////////////////////////POINTEUR\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
@@ -3447,7 +3447,7 @@ class partie_3 extends Phaser.Scene {
         this.sonB.loop = true;
         this.sonMarche.loop = true;
         this.sonB.volume = 0.9;
-        this.sonB.volume = 10;
+        
 
     /////////////////////////////////POINTEUR\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
