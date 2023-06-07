@@ -3,6 +3,7 @@ Q  aller à gauche
 D  aller à droite
 S  descendre plus vite
 espace  sauter
+E  Action avec l'environement
 F  activer bouclier
 X  activer propulsion
 R  recharger avant surchauffe
