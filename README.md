@@ -11,3 +11,4 @@ clique droit  extention de la vue (le curseur doit rester proche du personnage p
 
 ///////////////////////////////////////////////////////////////////
 Pour ouvrire les portes il faudra détruire un à plusieurs générateur
+
