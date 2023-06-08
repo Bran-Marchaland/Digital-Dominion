@@ -14,7 +14,65 @@ var cap1 = false;
 var rechCap1 = 0;
 var rechargeB = 0;
 var rechargeJ = 0;
+const WIDTH = 896;
+const HEIGHT = 448;
 /// idée musique https://www.youtube.com/watch?v=GMG-SkU0Cis&list=RDMMAqYYvGz0eh4&index=23
+
+
+class menuP extends Phaser.Scene {
+    constructor() {
+        super('menuP');
+    }
+
+    preload() {
+        this.load.image("B3", 'maps/BG3.png');
+        this.load.image("B2", 'maps/BG2.png');
+        this.load.image("B1", 'maps/BG1.png');
+        this.load.image("button", 'maps/button.png');
+
+    }
+
+
+    create() {
+        this.TroisiemePlan = this.add.image(WIDTH / 2, HEIGHT / 2, "B3");
+        this.SecondPlan = this.add.image(WIDTH / 2, HEIGHT / 2, "B2").setScrollFactor(0.85, 1);
+        this.premierPlan = this.add.image(WIDTH / 2, HEIGHT / 2, "B1").setScrollFactor(0.85, 1);
+
+
+        var button = this.add.sprite(400, 340, 'button')
+        button.setInteractive();
+        button.once('pointerdown', () => {
+            this.Startgame();
+        });
+    }
+
+    update() {
+        HP = 11
+        const mx = this.input.mousePointer.x;
+        const my = this.input.mousePointer.y;
+
+        this.SecondPlan.x = WIDTH / 2 + (mx / 50);
+        this.SecondPlan.y = HEIGHT / 2 + (my / 50);
+
+        this.premierPlan.x = WIDTH / 2 + (mx / 10);
+        this.premierPlan.y = HEIGHT / 2 + (my / 10);
+
+
+    }
+
+
+    Startgame() {
+        this.scene.start('partie_1')
+
+    }
+
+}
+
+
+
+
+
+
 
 class partie_1 extends Phaser.Scene {
     constructor() {
@@ -26,8 +84,8 @@ class partie_1 extends Phaser.Scene {
 
     preload() {
         this.load.tilemapTiledJSON("partie_1", "maps/partie_1.json");
-        this.load.image("phaser_assets", "maps/test.png");
-        this.load.image('perso', 'sprites/test_perso.png');
+        this.load.image("phaser_assets", "maps/tuile.png");
+        //this.load.image('fond1', 'maps/fond_1.png');
         this.load.image('ascensseur', 'maps/ascensseur.png');
         this.load.image('heal', 'sprites/heal.png');
         this.load.image('hb_ascensseur', 'maps/hb_ascensseur.png');
@@ -38,19 +96,20 @@ class partie_1 extends Phaser.Scene {
         this.load.image('porteS2', 'sprites/porte_simple_2.png');
         this.load.image('TP1', 'maps/TP.png');
         this.load.image('bouclier', 'sprites/bouclier.png');
-        this.load.image('generateur', 'sprites/generateur.png');
         this.load.image('HBZM', 'sprites/hb_z_m.png');
         this.load.image('porteL', 'sprites/porte_lourd.png');
         this.load.image('lazzzzzer', 'sprites/lazzzzzer.png');
         this.load.image('tire_p_A_1', 'sprites/tire_p_A_1.png');
+        this.load.spritesheet('generateur', 'sprites/generateur.png',
+            { frameWidth: 257, frameHeight: 320 });
         this.load.spritesheet('HP', 'sprites/barre_vie.png',
             { frameWidth: 1300, frameHeight: 200 });
         this.load.spritesheet('surchauffe', 'sprites/surchauffe.png',
             { frameWidth: 30, frameHeight: 60 });
         this.load.spritesheet('powerU', 'sprites/powerUP.png',
             { frameWidth: 128, frameHeight: 128 });
-
-
+        this.load.spritesheet('perso', 'sprites/persoA.png',
+            { frameWidth: 192, frameHeight: 192 });
         this.load.setPath('sound');
         this.load.audio('B1', 'DBateuse_3.mp3');
         this.load.audio('B2', 'MBateuse_3.mp3');
@@ -67,11 +126,17 @@ class partie_1 extends Phaser.Scene {
         this.sonBF = this.sound.add('B3');
         this.sonMarche = this.sound.add('M');
         this.sonPropulsion = this.sound.add('PP');
+        this.sonTT.volume = 0.05;
+        this.sonB.volume = 0.1;
+        this.sonBF.volume = 0.1;
+        this.sonMarche.volume = 0.1;
 
+
+        //this.planet = this.add.image(12800, 12800, "fond1").setScrollFactor(0.85,1);
 
         //input=this.input;
         const carteDuNiveau = this.add.tilemap("partie_1");
-        const tileset = carteDuNiveau.addTilesetImage("test", "phaser_assets");
+        const tileset = carteDuNiveau.addTilesetImage("tuile", "phaser_assets");
         const base = carteDuNiveau.createLayer('map', tileset);
         base.setCollisionByProperty({ estSolide: true });
         this.player = this.physics.add.sprite(17 * 64, 9 * 64, 'perso');
@@ -88,7 +153,11 @@ class partie_1 extends Phaser.Scene {
         this.surchauffeV.depth = 1000
         this.vie.depth = 1000
         this.sonB.play();
+        this.sonB.setVolume(0.1);
+
         this.sonMarche.play();
+        this.sonMarche.setVolume(0.1);
+
         this.sonB.pause();
         this.sonMarche.pause();
         this.sonB.loop = true;
@@ -119,6 +188,8 @@ class partie_1 extends Phaser.Scene {
                 isLeftButtonDown = false;
                 this.sonB.pause();
                 this.sonBF.play();
+                this.sonBF.setVolume(0.1);
+
             }
         });
 
@@ -513,7 +584,7 @@ class partie_1 extends Phaser.Scene {
 
 
         this.bouclier = this.physics.add.sprite(91 * 64, 127 * 64, 'bouclier');
-        //this.bouclier.disableBody(true)
+        //this.bouclierq.disableBody(true)
 
         this.bouclier.setOrigin(0.5, 0.17);
         this.bouclier.setScale(1)
@@ -536,8 +607,59 @@ class partie_1 extends Phaser.Scene {
         //})
 
 
+
+
+
+
         /////////////////////////////////VIE\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
+
+
+        this.anims.create({
+            key: 'G1',
+            frames: this.anims.generateFrameNumbers('generateur', { start: 0, end: 0 }),
+            frameRate: 4,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'G2',
+            frames: this.anims.generateFrameNumbers('generateur', { start: 1, end: 1 }),
+            frameRate: 4,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'G3',
+            frames: this.anims.generateFrameNumbers('generateur', { start: 2, end: 2 }),
+            frameRate: 4,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'G4',
+            frames: this.anims.generateFrameNumbers('generateur', { start: 3, end: 3 }),
+            frameRate: 4,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'idle',
+            frames: this.anims.generateFrameNumbers('perso', { start: 0, end: 0 }),
+            frameRate: 4,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'PR',
+            frames: this.anims.generateFrameNumbers('perso', { start: 0, end: 8 }),
+            frameRate: 4,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'PL',
+            frames: this.anims.generateFrameNumbers('perso', { start: 10, end: 18 }),
+            frameRate: 4,
+            repeat: -1
+        });
 
 
         this.anims.create({
@@ -1087,6 +1209,8 @@ class partie_1 extends Phaser.Scene {
                 this.canshootA1 = false
                 recharge = 1
                 this.sonBF.play();
+                this.sonBF.setVolume(0.1);
+
                 this.sonB.pause();
 
                 setTimeout(() => {
@@ -1097,6 +1221,12 @@ class partie_1 extends Phaser.Scene {
             }
 
         }
+
+
+    if(HP ==  0){
+        this.scene.start("menuP")
+
+    }
 
 
         if (surchauffe > 0 && this.clavier.R.isDown && recharge == 0) {
@@ -1159,6 +1289,7 @@ class partie_1 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[0].x, this.tourelle.getChildren()[0].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[0].x).setVelocityY(this.player.y - this.tourelle.getChildren()[0].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[0].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[0].canshoot = true
                     }, 2500);
@@ -1173,6 +1304,7 @@ class partie_1 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[1].x, this.tourelle.getChildren()[1].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[1].x).setVelocityY(this.player.y - this.tourelle.getChildren()[1].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[1].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.canshoot2 = true
                     }, 1000);
@@ -1187,6 +1319,7 @@ class partie_1 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[2].x, this.tourelle.getChildren()[2].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[2].x).setVelocityY(this.player.y - this.tourelle.getChildren()[2].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[2].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[2].canshoot = true
                     }, 2000);
@@ -1201,6 +1334,7 @@ class partie_1 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[3].x, this.tourelle.getChildren()[3].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[3].x).setVelocityY(this.player.y - this.tourelle.getChildren()[3].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[3].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[3].canshoot = true
                     }, 2200);
@@ -1215,6 +1349,7 @@ class partie_1 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[4].x, this.tourelle.getChildren()[4].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[4].x).setVelocityY(this.player.y - this.tourelle.getChildren()[4].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[4].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[4].canshoot = true
                     }, 1900);
@@ -1229,6 +1364,7 @@ class partie_1 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[5].x, this.tourelle.getChildren()[5].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[5].x).setVelocityY(this.player.y - this.tourelle.getChildren()[5].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[5].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[5].canshoot = true
                     }, 2400);
@@ -1243,6 +1379,7 @@ class partie_1 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[6].x, this.tourelle.getChildren()[6].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[6].x).setVelocityY(this.player.y - this.tourelle.getChildren()[6].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[6].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[6].canshoot = true
                     }, 3200);
@@ -1257,6 +1394,7 @@ class partie_1 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[7].x, this.tourelle.getChildren()[7].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[7].x).setVelocityY(this.player.y - this.tourelle.getChildren()[7].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[7].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[7].canshoot = true
                     }, 3000);
@@ -1271,6 +1409,7 @@ class partie_1 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[8].x, this.tourelle.getChildren()[8].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[8].x).setVelocityY(this.player.y - this.tourelle.getChildren()[8].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[8].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[8].canshoot = true
                     }, 3000);
@@ -1285,6 +1424,7 @@ class partie_1 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[9].x, this.tourelle.getChildren()[9].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[9].x).setVelocityY(this.player.y - this.tourelle.getChildren()[9].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[9].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[9].canshoot = true
                     }, 2500);
@@ -1299,6 +1439,7 @@ class partie_1 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[10].x, this.tourelle.getChildren()[10].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[10].x).setVelocityY(this.player.y - this.tourelle.getChildren()[10].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[10].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[10].canshoot = true
                     }, 2200);
@@ -1313,6 +1454,7 @@ class partie_1 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[11].x, this.tourelle.getChildren()[11].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[11].x).setVelocityY(this.player.y - this.tourelle.getChildren()[11].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[11].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[11].canshoot = true
                     }, 2500);
@@ -1327,6 +1469,7 @@ class partie_1 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[12].x, this.tourelle.getChildren()[12].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[12].x).setVelocityY(this.player.y - this.tourelle.getChildren()[12].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[12].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[12].canshoot = true
                     }, 2500);
@@ -1341,6 +1484,7 @@ class partie_1 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[13].x, this.tourelle.getChildren()[13].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[13].x).setVelocityY(this.player.y - this.tourelle.getChildren()[13].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[13].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[13].canshoot = true
                     }, 2500);
@@ -1355,6 +1499,7 @@ class partie_1 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[14].x, this.tourelle.getChildren()[14].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[14].x).setVelocityY(this.player.y - this.tourelle.getChildren()[14].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[14].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[14].canshoot = true
                     }, 2500);
@@ -1364,11 +1509,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.tourelle.getChildren()[15]) {
             const distance16 = Phaser.Math.Distance.Between(this.tourelle.getChildren()[15].x, this.tourelle.getChildren()[15].y, this.player.x, this.player.y);
-            if (distance16 < 3000) {
+            if (distance16 < 1500) {
                 if (this.tourelle.getChildren()[15].canshoot == true) {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[15].x, this.tourelle.getChildren()[15].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[15].x).setVelocityY(this.player.y - this.tourelle.getChildren()[15].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[15].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[15].canshoot = true
                     }, 1000);
@@ -1378,11 +1524,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.tourelle.getChildren()[16]) {
             const distance17 = Phaser.Math.Distance.Between(this.tourelle.getChildren()[16].x, this.tourelle.getChildren()[16].y, this.player.x, this.player.y);
-            if (distance17 < 3000) {
+            if (distance17 < 1500) {
                 if (this.tourelle.getChildren()[16].canshoot == true) {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[16].x, this.tourelle.getChildren()[16].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[16].x).setVelocityY(this.player.y - this.tourelle.getChildren()[16].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[16].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[16].canshoot = true
                     }, 1000);
@@ -1392,11 +1539,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.tourelle.getChildren()[17]) {
             const distance18 = Phaser.Math.Distance.Between(this.tourelle.getChildren()[17].x, this.tourelle.getChildren()[17].y, this.player.x, this.player.y);
-            if (distance18 < 3000) {
+            if (distance18 < 1500) {
                 if (this.tourelle.getChildren()[17].canshoot == true) {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[17].x, this.tourelle.getChildren()[17].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[17].x).setVelocityY(this.player.y - this.tourelle.getChildren()[17].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[17].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[17].canshoot = true
                     }, 1000);
@@ -1406,11 +1554,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.tourelle.getChildren()[18]) {
             const distance19 = Phaser.Math.Distance.Between(this.tourelle.getChildren()[18].x, this.tourelle.getChildren()[18].y, this.player.x, this.player.y);
-            if (distance19 < 3000) {
+            if (distance19 < 1500) {
                 if (this.tourelle.getChildren()[18].canshoot == true) {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[18].x, this.tourelle.getChildren()[18].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[18].x).setVelocityY(this.player.y - this.tourelle.getChildren()[18].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[18].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.canshoot20 = true
                     }, 1000);
@@ -1420,11 +1569,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.tourelle.getChildren()[19]) {
             const distance20 = Phaser.Math.Distance.Between(this.tourelle.getChildren()[19].x, this.tourelle.getChildren()[19].y, this.player.x, this.player.y);
-            if (distance20 < 3000) {
+            if (distance20 < 1500) {
                 if (this.tourelle.getChildren()[19].canshoot == true) {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[19].x, this.tourelle.getChildren()[19].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[19].x).setVelocityY(this.player.y - this.tourelle.getChildren()[19].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[19].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[19].canshoot = true
                     }, 1000);
@@ -1434,11 +1584,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.tourelle.getChildren()[20]) {
             const distance21 = Phaser.Math.Distance.Between(this.tourelle.getChildren()[20].x, this.tourelle.getChildren()[20].y, this.player.x, this.player.y);
-            if (distance21 < 3000) {
+            if (distance21 < 1500) {
                 if (this.tourelle.getChildren()[20].canshoot == true) {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[20].x, this.tourelle.getChildren()[20].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[20].x).setVelocityY(this.player.y - this.tourelle.getChildren()[20].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[20].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[20].canshoot = true
                     }, 1000);
@@ -1448,11 +1599,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.tourelle.getChildren()[21]) {
             const distance22 = Phaser.Math.Distance.Between(this.tourelle.getChildren()[21].x, this.tourelle.getChildren()[21].y, this.player.x, this.player.y);
-            if (distance22 < 3000) {
+            if (distance22 < 1500) {
                 if (this.tourelle.getChildren()[21].canshoot == true) {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[21].x, this.tourelle.getChildren()[21].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[21].x).setVelocityY(this.player.y - this.tourelle.getChildren()[21].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[21].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[21].canshoot = true
                     }, 1000);
@@ -1462,11 +1614,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.tourelle.getChildren()[22]) {
             const distance23 = Phaser.Math.Distance.Between(this.tourelle.getChildren()[22].x, this.tourelle.getChildren()[22].y, this.player.x, this.player.y);
-            if (distance23 < 3000) {
+            if (distance23 < 1500) {
                 if (this.tourelle.getChildren()[22].canshoot == true) {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[22].x, this.tourelle.getChildren()[22].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[22].x).setVelocityY(this.player.y - this.tourelle.getChildren()[22].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[22].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[22].canshoot = true
                     }, 1000);
@@ -1478,11 +1631,12 @@ class partie_1 extends Phaser.Scene {
             const distance24 = Phaser.Math.Distance.Between(this.tourelle.getChildren()[23].x, this.tourelle.getChildren()[23].y, this.player.x, this.player.y);
             this.tourelle.getChildren()[23].x = this.plateforme_1.x + 128
             this.tourelle.getChildren()[23].y = this.plateforme_1.y + 64
-            if (distance24 < 3000) {
+            if (distance24 < 1500) {
                 if (this.tourelle.getChildren()[23].canshoot == true) {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[23].x, this.tourelle.getChildren()[23].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[23].x).setVelocityY(this.player.y - this.tourelle.getChildren()[23].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[23].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[23].canshoot = true
                     }, 1000);
@@ -1494,11 +1648,12 @@ class partie_1 extends Phaser.Scene {
             const distance25 = Phaser.Math.Distance.Between(this.tourelle.getChildren()[24].x, this.tourelle.getChildren()[24].y, this.player.x, this.player.y);
             this.tourelle.getChildren()[24].x = this.plateforme_1.x - 128
             this.tourelle.getChildren()[24].y = this.plateforme_1.y + 64
-            if (distance25 < 3000) {
+            if (distance25 < 1500) {
                 if (this.tourelle.getChildren()[24].canshoot == true) {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[24].x, this.tourelle.getChildren()[24].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[24].x).setVelocityY(this.player.y - this.tourelle.getChildren()[24].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[24].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[24].canshoot = true
                     }, 1000);
@@ -1510,11 +1665,12 @@ class partie_1 extends Phaser.Scene {
             const distance26 = Phaser.Math.Distance.Between(this.tourelle.getChildren()[25].x, this.tourelle.getChildren()[25].y, this.player.x, this.player.y);
             this.tourelle.getChildren()[25].x = this.plateforme_2.x - 128
             this.tourelle.getChildren()[25].y = this.plateforme_2.y + 64
-            if (distance26 < 3000) {
+            if (distance26 < 1500) {
                 if (this.tourelle.getChildren()[25].canshoot == true) {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[25].x, this.tourelle.getChildren()[25].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[25].x).setVelocityY(this.player.y - this.tourelle.getChildren()[25].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[25].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[25].canshoot = true
                     }, 2000);
@@ -1526,11 +1682,12 @@ class partie_1 extends Phaser.Scene {
             const distance27 = Phaser.Math.Distance.Between(this.tourelle.getChildren()[26].x, this.tourelle.getChildren()[26].y, this.player.x, this.player.y);
             this.tourelle.getChildren()[26].x = this.plateforme_2.x + 128
             this.tourelle.getChildren()[26].y = this.plateforme_2.y + 64
-            if (distance27 < 3000) {
+            if (distance27 < 1500) {
                 if (this.tourelle.getChildren()[26].canshoot == true) {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[26].x, this.tourelle.getChildren()[26].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[26].x).setVelocityY(this.player.y - this.tourelle.getChildren()[26].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[26].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[26].canshoot = true
                     }, 1800);
@@ -1540,11 +1697,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.tourelle.getChildren()[27]) {
             const distance28 = Phaser.Math.Distance.Between(this.tourelle.getChildren()[27].x, this.tourelle.getChildren()[27].y, this.player.x, this.player.y);
-            if (distance28 < 3000) {
+            if (distance28 < 1500) {
                 if (this.tourelle.getChildren()[27].canshoot == true) {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[27].x, this.tourelle.getChildren()[27].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[27].x).setVelocityY(this.player.y - this.tourelle.getChildren()[27].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[27].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[27].canshoot = true
                     }, 1800);
@@ -1554,11 +1712,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.tourelle.getChildren()[28]) {
             const distance29 = Phaser.Math.Distance.Between(this.tourelle.getChildren()[28].x, this.tourelle.getChildren()[28].y, this.player.x, this.player.y);
-            if (distance29 < 3000) {
+            if (distance29 < 1500) {
                 if (this.tourelle.getChildren()[28].canshoot == true) {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[28].x, this.tourelle.getChildren()[28].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[28].x).setVelocityY(this.player.y - this.tourelle.getChildren()[28].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[28].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[28].canshoot = true
                     }, 1800);
@@ -1568,11 +1727,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.tourelle.getChildren()[29]) {
             const distance30 = Phaser.Math.Distance.Between(this.tourelle.getChildren()[29].x, this.tourelle.getChildren()[29].y, this.player.x, this.player.y);
-            if (distance30 < 3000) {
+            if (distance30 < 1500) {
                 if (this.tourelle.getChildren()[29].canshoot == true) {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[29].x, this.tourelle.getChildren()[29].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[29].x).setVelocityY(this.player.y - this.tourelle.getChildren()[29].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[29].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[29].canshoot = true
                     }, 1800);
@@ -1582,11 +1742,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.tourelle.getChildren()[30]) {
             const distance31 = Phaser.Math.Distance.Between(this.tourelle.getChildren()[30].x, this.tourelle.getChildren()[30].y, this.player.x, this.player.y);
-            if (distance31 < 3000) {
+            if (distance31 < 1500) {
                 if (this.tourelle.getChildren()[30].canshoot == true) {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[30].x, this.tourelle.getChildren()[30].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[30].x).setVelocityY(this.player.y - this.tourelle.getChildren()[30].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[30].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[30].canshoot = true
                     }, 1800);
@@ -1596,11 +1757,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.tourelle.getChildren()[31]) {
             const distance32 = Phaser.Math.Distance.Between(this.tourelle.getChildren()[31].x, this.tourelle.getChildren()[31].y, this.player.x, this.player.y);
-            if (distance32 < 3000) {
+            if (distance32 < 1500) {
                 if (this.tourelle.getChildren()[31].canshoot == true) {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[31].x, this.tourelle.getChildren()[31].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[31].x).setVelocityY(this.player.y - this.tourelle.getChildren()[31].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[31].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[31].canshoot = true
                     }, 1800);
@@ -1610,11 +1772,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.tourelle.getChildren()[32]) {
             const distance33 = Phaser.Math.Distance.Between(this.tourelle.getChildren()[32].x, this.tourelle.getChildren()[32].y, this.player.x, this.player.y);
-            if (distance33 < 3000) {
+            if (distance33 < 1500) {
                 if (this.tourelle.getChildren()[32].canshoot == true) {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[32].x, this.tourelle.getChildren()[32].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[32].x).setVelocityY(this.player.y - this.tourelle.getChildren()[32].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[32].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[32].canshoot = true
                     }, 1800);
@@ -1624,11 +1787,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.tourelle.getChildren()[33]) {
             const distance34 = Phaser.Math.Distance.Between(this.tourelle.getChildren()[33].x, this.tourelle.getChildren()[33].y, this.player.x, this.player.y);
-            if (distance34 < 3000) {
+            if (distance34 < 1500) {
                 if (this.tourelle.getChildren()[33].canshoot == true) {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[33].x, this.tourelle.getChildren()[33].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[33].x).setVelocityY(this.player.y - this.tourelle.getChildren()[33].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[33].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[33].canshoot = true
                     }, 1800);
@@ -1638,11 +1802,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.tourelle.getChildren()[34]) {
             const distance35 = Phaser.Math.Distance.Between(this.tourelle.getChildren()[34].x, this.tourelle.getChildren()[34].y, this.player.x, this.player.y);
-            if (distance35 < 3000) {
+            if (distance35 < 1500) {
                 if (this.tourelle.getChildren()[34].canshoot == true) {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[34].x, this.tourelle.getChildren()[34].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[34].x).setVelocityY(this.player.y - this.tourelle.getChildren()[34].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[34].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[34].canshoot = true
                     }, 1800);
@@ -1652,11 +1817,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.tourelle.getChildren()[35]) {
             const distance36 = Phaser.Math.Distance.Between(this.tourelle.getChildren()[35].x, this.tourelle.getChildren()[35].y, this.player.x, this.player.y);
-            if (distance36 < 3000) {
+            if (distance36 < 1500) {
                 if (this.tourelle.getChildren()[35].canshoot == true) {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[35].x, this.tourelle.getChildren()[35].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[35].x).setVelocityY(this.player.y - this.tourelle.getChildren()[35].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[35].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[35].canshoot = true
                     }, 1800);
@@ -1666,11 +1832,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.tourelle.getChildren()[36]) {
             const distance37 = Phaser.Math.Distance.Between(this.tourelle.getChildren()[36].x, this.tourelle.getChildren()[36].y, this.player.x, this.player.y);
-            if (distance37 < 3000) {
+            if (distance37 < 1500) {
                 if (this.tourelle.getChildren()[36].canshoot == true) {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[36].x, this.tourelle.getChildren()[36].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[36].x).setVelocityY(this.player.y - this.tourelle.getChildren()[36].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[36].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[36].canshoot = true
                     }, 1800);
@@ -1680,11 +1847,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.tourelle.getChildren()[37]) {
             const distance38 = Phaser.Math.Distance.Between(this.tourelle.getChildren()[37].x, this.tourelle.getChildren()[37].y, this.player.x, this.player.y);
-            if (distance38 < 3000) {
+            if (distance38 < 1500) {
                 if (this.tourelle.getChildren()[37].canshoot == true) {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[37].x, this.tourelle.getChildren()[37].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[37].x).setVelocityY(this.player.y - this.tourelle.getChildren()[37].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[37].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[37].canshoot = true
                     }, 1800);
@@ -1694,11 +1862,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.tourelle.getChildren()[38]) {
             const distance39 = Phaser.Math.Distance.Between(this.tourelle.getChildren()[38].x, this.tourelle.getChildren()[38].y, this.player.x, this.player.y);
-            if (distance39 < 3000) {
+            if (distance39 < 1500) {
                 if (this.tourelle.getChildren()[38].canshoot == true) {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[38].x, this.tourelle.getChildren()[38].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[38].x).setVelocityY(this.player.y - this.tourelle.getChildren()[38].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[38].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[38].canshoot = true
                     }, 1800);
@@ -1708,11 +1877,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.robot.getChildren()[0]) {
             const distance40 = Phaser.Math.Distance.Between(this.robot.getChildren()[0].x, this.robot.getChildren()[0].y, this.player.x, this.player.y);
-            if (distance40 < 3000) {
+            if (distance40 < 1500) {
                 if (this.robot.getChildren()[0].canshoot == true) {
                     this.projectile_tourelle.create(this.robot.getChildren()[0].x, this.robot.getChildren()[0].y, "lazzzzzer").setVelocityX(this.player.x - this.robot.getChildren()[0].x).setVelocityY(this.player.y - this.robot.getChildren()[0].y).body.setAllowGravity(false)
                     this.robot.getChildren()[0].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.robot.getChildren()[0].canshoot = true
                     }, 1800);
@@ -1722,11 +1892,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.robot.getChildren()[1]) {
             const distance41 = Phaser.Math.Distance.Between(this.robot.getChildren()[1].x, this.robot.getChildren()[1].y, this.player.x, this.player.y);
-            if (distance41 < 3000) {
+            if (distance41 < 1500) {
                 if (this.robot.getChildren()[1].canshoot == true) {
                     this.projectile_tourelle.create(this.robot.getChildren()[1].x, this.robot.getChildren()[1].y, "lazzzzzer").setVelocityX(this.player.x - this.robot.getChildren()[1].x).setVelocityY(this.player.y - this.robot.getChildren()[1].y).body.setAllowGravity(false)
                     this.robot.getChildren()[1].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.robot.getChildren()[1].canshoot = true
                     }, 1800);
@@ -1736,11 +1907,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.robot.getChildren()[2]) {
             const distance42 = Phaser.Math.Distance.Between(this.robot.getChildren()[2].x, this.robot.getChildren()[2].y, this.player.x, this.player.y);
-            if (distance42 < 3000) {
+            if (distance42 < 1500) {
                 if (this.robot.getChildren()[2].canshoot == true) {
                     this.projectile_tourelle.create(this.robot.getChildren()[2].x, this.robot.getChildren()[2].y, "lazzzzzer").setVelocityX(this.player.x - this.robot.getChildren()[2].x).setVelocityY(this.player.y - this.robot.getChildren()[2].y).body.setAllowGravity(false)
                     this.robot.getChildren()[2].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.robot.getChildren()[2].canshoot = true
                     }, 1800);
@@ -1750,11 +1922,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.robot.getChildren()[3]) {
             const distance43 = Phaser.Math.Distance.Between(this.robot.getChildren()[3].x, this.robot.getChildren()[3].y, this.player.x, this.player.y);
-            if (distance43 < 3000) {
+            if (distance43 < 1500) {
                 if (this.robot.getChildren()[3].canshoot == true) {
                     this.projectile_tourelle.create(this.robot.getChildren()[3].x, this.robot.getChildren()[3].y, "lazzzzzer").setVelocityX(this.player.x - this.robot.getChildren()[3].x).setVelocityY(this.player.y - this.robot.getChildren()[3].y).body.setAllowGravity(false)
                     this.robot.getChildren()[3].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.robot.getChildren()[3].canshoot = true
                     }, 1800);
@@ -1764,11 +1937,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.robot.getChildren()[4]) {
             const distance44 = Phaser.Math.Distance.Between(this.robot.getChildren()[4].x, this.robot.getChildren()[4].y, this.player.x, this.player.y);
-            if (distance44 < 3000) {
+            if (distance44 < 1500) {
                 if (this.robot.getChildren()[4].canshoot == true) {
                     this.projectile_tourelle.create(this.robot.getChildren()[4].x, this.robot.getChildren()[4].y, "lazzzzzer").setVelocityX(this.player.x - this.robot.getChildren()[4].x).setVelocityY(this.player.y - this.robot.getChildren()[4].y).body.setAllowGravity(false)
                     this.robot.getChildren()[4].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.robot.getChildren()[4].canshoot = true
                     }, 1800);
@@ -1778,11 +1952,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.robot.getChildren()[5]) {
             const distance45 = Phaser.Math.Distance.Between(this.robot.getChildren()[5].x, this.robot.getChildren()[5].y, this.player.x, this.player.y);
-            if (distance45 < 3000) {
+            if (distance45 < 1500) {
                 if (this.robot.getChildren()[5].canshoot == true) {
                     this.projectile_tourelle.create(this.robot.getChildren()[5].x, this.robot.getChildren()[5].y, "lazzzzzer").setVelocityX(this.player.x - this.robot.getChildren()[5].x).setVelocityY(this.player.y - this.robot.getChildren()[5].y).body.setAllowGravity(false)
                     this.robot.getChildren()[5].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.robot.getChildren()[5].canshoot = true
                     }, 1800);
@@ -1792,11 +1967,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.robot.getChildren()[6]) {
             const distance46 = Phaser.Math.Distance.Between(this.robot.getChildren()[6].x, this.robot.getChildren()[6].y, this.player.x, this.player.y);
-            if (distance46 < 3000) {
+            if (distance46 < 1500) {
                 if (this.robot.getChildren()[6].canshoot == true) {
                     this.projectile_tourelle.create(this.robot.getChildren()[6].x, this.robot.getChildren()[6].y, "lazzzzzer").setVelocityX(this.player.x - this.robot.getChildren()[6].x).setVelocityY(this.player.y - this.robot.getChildren()[6].y).body.setAllowGravity(false)
                     this.robot.getChildren()[6].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.robot.getChildren()[6].canshoot = true
                     }, 1800);
@@ -1806,11 +1982,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.robot.getChildren()[7]) {
             const distance47 = Phaser.Math.Distance.Between(this.robot.getChildren()[7].x, this.robot.getChildren()[7].y, this.player.x, this.player.y);
-            if (distance47 < 3000) {
+            if (distance47 < 1500) {
                 if (this.robot.getChildren()[7].canshoot == true) {
                     this.projectile_tourelle.create(this.robot.getChildren()[7].x, this.robot.getChildren()[7].y, "lazzzzzer").setVelocityX(this.player.x - this.robot.getChildren()[7].x).setVelocityY(this.player.y - this.robot.getChildren()[7].y).body.setAllowGravity(false)
                     this.robot.getChildren()[7].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.robot.getChildren()[7].canshoot = true
                     }, 1800);
@@ -1820,11 +1997,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.robot.getChildren()[8]) {
             const distance48 = Phaser.Math.Distance.Between(this.robot.getChildren()[8].x, this.robot.getChildren()[8].y, this.player.x, this.player.y);
-            if (distance48 < 3000) {
+            if (distance48 < 1500) {
                 if (this.robot.getChildren()[8].canshoot == true) {
                     this.projectile_tourelle.create(this.robot.getChildren()[8].x, this.robot.getChildren()[8].y, "lazzzzzer").setVelocityX(this.player.x - this.robot.getChildren()[8].x).setVelocityY(this.player.y - this.robot.getChildren()[8].y).body.setAllowGravity(false)
                     this.robot.getChildren()[8].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.robot.getChildren()[8].canshoot = true
                     }, 1800);
@@ -1834,11 +2012,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.robot.getChildren()[9]) {
             const distance49 = Phaser.Math.Distance.Between(this.robot.getChildren()[9].x, this.robot.getChildren()[9].y, this.player.x, this.player.y);
-            if (distance49 < 3000) {
+            if (distance49 < 1500) {
                 if (this.robot.getChildren()[9].canshoot == true) {
                     this.projectile_tourelle.create(this.robot.getChildren()[9].x, this.robot.getChildren()[9].y, "lazzzzzer").setVelocityX(this.player.x - this.robot.getChildren()[9].x).setVelocityY(this.player.y - this.robot.getChildren()[9].y).body.setAllowGravity(false)
                     this.robot.getChildren()[9].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.robot.getChildren()[9].canshoot = true
                     }, 1800);
@@ -1848,11 +2027,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.robot.getChildren()[10]) {
             const distance50 = Phaser.Math.Distance.Between(this.robot.getChildren()[10].x, this.robot.getChildren()[10].y, this.player.x, this.player.y);
-            if (distance50 < 3000) {
+            if (distance50 < 1500) {
                 if (this.robot.getChildren()[10].canshoot == true) {
                     this.projectile_tourelle.create(this.robot.getChildren()[10].x, this.robot.getChildren()[10].y, "lazzzzzer").setVelocityX(this.player.x - this.robot.getChildren()[10].x).setVelocityY(this.player.y - this.robot.getChildren()[10].y).body.setAllowGravity(false)
                     this.robot.getChildren()[10].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.robot.getChildren()[10].canshoot = true
                     }, 1800);
@@ -1862,11 +2042,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.robot.getChildren()[11]) {
             const distance51 = Phaser.Math.Distance.Between(this.robot.getChildren()[11].x, this.robot.getChildren()[11].y, this.player.x, this.player.y);
-            if (distance51 < 3000) {
+            if (distance51 < 1500) {
                 if (this.robot.getChildren()[11].canshoot == true) {
                     this.projectile_tourelle.create(this.robot.getChildren()[11].x, this.robot.getChildren()[11].y, "lazzzzzer").setVelocityX(this.player.x - this.robot.getChildren()[11].x).setVelocityY(this.player.y - this.robot.getChildren()[11].y).body.setAllowGravity(false)
                     this.robot.getChildren()[11].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.robot.getChildren()[11].canshoot = true
                     }, 1800);
@@ -1876,11 +2057,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.robot.getChildren()[12]) {
             const distance52 = Phaser.Math.Distance.Between(this.robot.getChildren()[12].x, this.robot.getChildren()[12].y, this.player.x, this.player.y);
-            if (distance52 < 3000) {
+            if (distance52 < 1500) {
                 if (this.robot.getChildren()[12].canshoot == true) {
                     this.projectile_tourelle.create(this.robot.getChildren()[12].x, this.robot.getChildren()[12].y, "lazzzzzer").setVelocityX(this.player.x - this.robot.getChildren()[12].x).setVelocityY(this.player.y - this.robot.getChildren()[12].y).body.setAllowGravity(false)
                     this.robot.getChildren()[12].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.robot.getChildren()[12].canshoot = true
                     }, 1800);
@@ -1890,11 +2072,12 @@ class partie_1 extends Phaser.Scene {
 
         if (this.robot.getChildren()[13]) {
             const distance53 = Phaser.Math.Distance.Between(this.robot.getChildren()[13].x, this.robot.getChildren()[13].y, this.player.x, this.player.y);
-            if (distance53 < 3000) {
+            if (distance53 < 1500) {
                 if (this.robot.getChildren()[13].canshoot == true) {
                     this.projectile_tourelle.create(this.robot.getChildren()[13].x, this.robot.getChildren()[13].y, "lazzzzzer").setVelocityX(this.player.x - this.robot.getChildren()[13].x).setVelocityY(this.player.y - this.robot.getChildren()[13].y).body.setAllowGravity(false)
                     this.robot.getChildren()[13].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.robot.getChildren()[13].canshoot = true
                     }, 1800);
@@ -1903,8 +2086,8 @@ class partie_1 extends Phaser.Scene {
         }
 
 
-        this.arme.x = this.player.x
-        this.arme.y = this.player.y
+        this.arme.x = this.player.x + 32
+        this.arme.y = this.player.y - 20
 
 
         //if (this.clavier.E.isDown){
@@ -1921,6 +2104,9 @@ class partie_1 extends Phaser.Scene {
                 this.player.setVelocityX(-600);
                 if (this.player.body.velocity.y == 0) {
                     this.sonMarche.resume();
+                    this.player.anims.play('PL', true);
+
+
 
                 }
                 //this.HB.x=this.player.x-32;
@@ -1930,6 +2116,8 @@ class partie_1 extends Phaser.Scene {
                 this.player.setVelocityX(600);
                 if (this.player.body.velocity.y == 0) {
                     this.sonMarche.resume();
+                    this.player.anims.play('PR', true);
+
                 }
                 //this.HB.x=this.player.x+32;
                 //this.HB.y=this.player.y;
@@ -1946,9 +2134,15 @@ class partie_1 extends Phaser.Scene {
 
             }
         }
+
+
+
+
+
         if (this.clavier.S.isDown) {
             this.player.setVelocityY(800);
         }
+
 
         if (this.player.body.velocity.y >= 900) {
             this.player.setVelocityY(800)
@@ -1967,7 +2161,9 @@ class partie_1 extends Phaser.Scene {
             this.shieldV.anims.play("shieldReloading", true);
         }
 
-
+       //if (this.generateur_1.vieGenerateur == 15) {
+       //    this.generateur_1.anime.play('G0',true);
+       //}
 
 
         if (HP == 11) {
@@ -2258,32 +2454,20 @@ class partie_1 extends Phaser.Scene {
             this.ascenseur_3.setVelocityX(500);
             setTimeout(() => {
                 this.ascenseur_3.setVelocityX(0)
-                this.last_plateforme_p1W()
+                this.last_plateforme_p2()
             }, 3105);
         }
     }
 
-    last_plateforme_p1W() {
-        this.ascenseur_3.setVelocityY(0);
-        setTimeout(() => {
-            this.last_plateforme_p2()
-        }, 2000);
-    }
 
     last_plateforme_p2() {
         this.ascenseur_3.setVelocityY(-500);
         setTimeout(() => {
-            this.last_plateforme_p2W()
+            this.last_plateforme_p3()
         }, 4000);
     }
 
-    last_plateforme_p2W() {
-        this.ascenseur_3.setVelocityY(0);
-        setTimeout(() => {
-            this.ascenseur_3.setVelocityY(0)
-            this.last_plateforme_p3()
-        }, 4200);
-    }
+
 
     last_plateforme_p3() {
         this.ascenseur_3.setVelocityX(500);
@@ -2368,8 +2552,7 @@ class partie_2 extends Phaser.Scene {
 
     preload() {
         this.load.tilemapTiledJSON("partie_2", "maps/partie_2.json");
-        this.load.image("phaser_assets", "maps/test.png");
-        this.load.image('perso', 'sprites/test_perso.png');
+        this.load.image("phaser_assets", "maps/tuile.png");
         this.load.image('ascensseur', 'maps/ascensseur.png');
         this.load.image('heal', 'sprites/heal.png');
         this.load.image('hb_ascensseur', 'maps/hb_ascensseur.png');
@@ -2380,19 +2563,23 @@ class partie_2 extends Phaser.Scene {
         this.load.image('porteS2', 'sprites/porte_simple_2.png');
         //this.load.image('TP1', 'maps/TP.png');
         this.load.image('MI', 'maps/murINV.png');
-        this.load.image('generateur', 'sprites/generateur.png');
         this.load.image('HBZM', 'sprites/hb_z_m.png');
         this.load.image('porteL', 'sprites/porte_lourd.png');
         this.load.image('lazzzzzer', 'sprites/lazzzzzer.png');
         this.load.image('tire_p_A_1', 'sprites/tire_p_A_1.png');
+        this.load.spritesheet('generateur', 'sprites/generateurA.png',
+            { frameWidth: 257, frameHeight: 320 });
         this.load.spritesheet('Loading', 'sprites/ecran_chargement.png',
             { frameWidth: 896, frameHeight: 448 });
         this.load.spritesheet('HP', 'sprites/barre_vie.png',
             { frameWidth: 1300, frameHeight: 200 });
         this.load.spritesheet('surchauffe', 'sprites/surchauffe.png',
             { frameWidth: 30, frameHeight: 60 });
-        this.load.spritesheet('powerUP', 'sprites/powerUP.png',
+        this.load.spritesheet('powerU', 'sprites/powerUP.png',
             { frameWidth: 128, frameHeight: 128 });
+        this.load.spritesheet('perso', 'sprites/persoA.png',
+            { frameWidth: 192, frameHeight: 192 }); this.load.spritesheet('powerUP', 'sprites/powerUP.png',
+                { frameWidth: 128, frameHeight: 128 });
 
 
 
@@ -2419,7 +2606,7 @@ class partie_2 extends Phaser.Scene {
 
         //input=this.input;
         const carteDuNiveau1 = this.add.tilemap("partie_2");
-        const tileset1 = carteDuNiveau1.addTilesetImage("test", "phaser_assets");
+        const tileset1 = carteDuNiveau1.addTilesetImage("tuile", "phaser_assets");
         const base1 = carteDuNiveau1.createLayer('base1', tileset1);
         base1.setCollisionByProperty({ estSolide: true });
         this.player = this.physics.add.sprite(14 * 64, 6 * 64, 'perso');
@@ -2436,7 +2623,9 @@ class partie_2 extends Phaser.Scene {
         this.vie.depth = 1000
 
         this.sonB.play();
+        this.sonB.setVolume(0.06);
         this.sonMarche.play();
+        this.sonMarche.setVolume(0.06);
         this.sonB.pause();
         this.sonMarche.pause();
         this.sonB.loop = true;
@@ -2467,6 +2656,8 @@ class partie_2 extends Phaser.Scene {
                 isLeftButtonDown = false;
                 this.sonB.pause();
                 this.sonBF.play();
+                this.sonBF.setVolume(0.1);
+
             }
         });
 
@@ -2531,6 +2722,54 @@ class partie_2 extends Phaser.Scene {
 
         /////////////////////////////////ANIM\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
+
+
+
+        this.anims.create({
+            key: 'G1',
+            frames: this.anims.generateFrameNumbers('generateur', { start: 0, end: 0 }),
+            frameRate: 4,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'G2',
+            frames: this.anims.generateFrameNumbers('generateur', { start: 1, end: 1 }),
+            frameRate: 4,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'G3',
+            frames: this.anims.generateFrameNumbers('generateur', { start: 2, end: 2 }),
+            frameRate: 4,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'G4',
+            frames: this.anims.generateFrameNumbers('generateur', { start: 3, end: 3 }),
+            frameRate: 4,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'idle',
+            frames: this.anims.generateFrameNumbers('perso', { start: 0, end: 0 }),
+            frameRate: 4,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'PR',
+            frames: this.anims.generateFrameNumbers('perso', { start: 0, end: 8 }),
+            frameRate: 4,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'PL',
+            frames: this.anims.generateFrameNumbers('perso', { start: 10, end: 18 }),
+            frameRate: 4,
+            repeat: -1
+        });
 
 
         this.anims.create({
@@ -3096,6 +3335,7 @@ class partie_2 extends Phaser.Scene {
                 this.canshootA1 = false
                 recharge = 1
                 this.sonBF.play();
+                this.sonBF.setVolume(0.1);
                 this.sonB.pause();
 
                 setTimeout(() => {
@@ -3137,6 +3377,8 @@ class partie_2 extends Phaser.Scene {
                 this.player.setVelocityX(-600);
                 if (this.player.body.velocity.y == 0) {
                     this.sonMarche.resume();
+                    this.player.anims.play('PL', true);
+
 
                 }
                 //this.HB.x=this.player.x-32;
@@ -3146,7 +3388,8 @@ class partie_2 extends Phaser.Scene {
                 this.player.setVelocityX(600);
                 if (this.player.body.velocity.y == 0) {
                     this.sonMarche.resume();
-                }
+                } this.player.anims.play('PR', true);
+
                 //this.HB.x=this.player.x+32;
                 //this.HB.y=this.player.y;
             }
@@ -3162,9 +3405,15 @@ class partie_2 extends Phaser.Scene {
 
             }
         }
+
+
+
+
+
         if (this.clavier.S.isDown) {
             this.player.setVelocityY(800);
         }
+
 
         if (this.player.body.velocity.y >= 900) {
             this.player.setVelocityY(800)
@@ -3182,7 +3431,7 @@ class partie_2 extends Phaser.Scene {
             this.shieldV.anims.play("shieldReloading", true);
         }
 
-        
+
         if (HP == 11) {
             this.vie.anims.play("HP11", true);
         }
@@ -3481,8 +3730,7 @@ class partie_3 extends Phaser.Scene {
 
     preload() {
         this.load.tilemapTiledJSON("partie_3", "maps/partie_3.json");
-        this.load.image("phaser_assets", "maps/test.png");
-        this.load.image('perso', 'sprites/test_perso.png');
+        this.load.image("phaser_assets", "maps/tuile.png");
         this.load.image('ascensseur', 'maps/ascensseur.png');
         this.load.image('heal', 'sprites/heal.png');
         this.load.image('hb_ascensseur', 'maps/hb_ascensseur.png');
@@ -3493,11 +3741,12 @@ class partie_3 extends Phaser.Scene {
         this.load.image('porteS2', 'sprites/porte_simple_2.png');
         //this.load.image('TP1', 'maps/TP.png');
         this.load.image('MI', 'maps/murINV.png');
-        this.load.image('generateur', 'sprites/generateur.png');
         this.load.image('HBZM', 'sprites/hb_z_m.png');
         this.load.image('porteL', 'sprites/porte_lourd.png');
         this.load.image('lazzzzzer', 'sprites/lazzzzzer.png');
         this.load.image('tire_p_A_1', 'sprites/tire_p_A_1.png');
+        this.load.spritesheet('generateur', 'sprites/generateurA.png',
+            { frameWidth: 257, frameHeight: 320 });
         this.load.image('caisse', 'sprites/caisse.png');
         this.load.spritesheet('Loading', 'sprites/ecran_chargement.png',
             { frameWidth: 896, frameHeight: 448 });
@@ -3505,8 +3754,11 @@ class partie_3 extends Phaser.Scene {
             { frameWidth: 1300, frameHeight: 200 });
         this.load.spritesheet('surchauffe', 'sprites/surchauffe.png',
             { frameWidth: 30, frameHeight: 60 });
-        this.load.spritesheet('powerUP', 'sprites/powerUP.png',
+        this.load.spritesheet('powerU', 'sprites/powerUP.png',
             { frameWidth: 128, frameHeight: 128 });
+        this.load.spritesheet('perso', 'sprites/persoA.png',
+            { frameWidth: 192, frameHeight: 192 }); this.load.spritesheet('powerUP', 'sprites/powerUP.png',
+                { frameWidth: 128, frameHeight: 128 });
 
 
         this.load.setPath('sound');
@@ -3530,7 +3782,7 @@ class partie_3 extends Phaser.Scene {
 
         //input=this.input;
         const carteDuNiveau2 = this.add.tilemap("partie_3");
-        const tileset2 = carteDuNiveau2.addTilesetImage("test", "phaser_assets");
+        const tileset2 = carteDuNiveau2.addTilesetImage("tuile", "phaser_assets");
         const base2 = carteDuNiveau2.createLayer('base2', tileset2);
         base2.setCollisionByProperty({ estSolide: true });
         this.player = this.physics.add.sprite(25 * 64, 6 * 64, 'perso');
@@ -3552,7 +3804,9 @@ class partie_3 extends Phaser.Scene {
         this.jumpV.visible = false;
 
         this.sonB.play();
+        this.sonB.setVolume(0.06);
         this.sonMarche.play();
+        this.sonMarche.setVolume(0.06);
         this.sonB.pause();
         this.sonMarche.pause();
         this.sonB.loop = true;
@@ -3583,6 +3837,7 @@ class partie_3 extends Phaser.Scene {
                 isLeftButtonDown = false;
                 this.sonB.pause();
                 this.sonBF.play();
+                this.sonBF.setVolume(0.1);
             }
         });
 
@@ -3723,6 +3978,54 @@ class partie_3 extends Phaser.Scene {
 
         /////////////////////////////////ANIM\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
+
+
+
+        this.anims.create({
+            key: 'G1',
+            frames: this.anims.generateFrameNumbers('generateur', { start: 0, end: 0 }),
+            frameRate: 4,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'G2',
+            frames: this.anims.generateFrameNumbers('generateur', { start: 1, end: 1 }),
+            frameRate: 4,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'G3',
+            frames: this.anims.generateFrameNumbers('generateur', { start: 2, end: 2 }),
+            frameRate: 4,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'G4',
+            frames: this.anims.generateFrameNumbers('generateur', { start: 3, end: 3 }),
+            frameRate: 4,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'idle',
+            frames: this.anims.generateFrameNumbers('perso', { start: 0, end: 0 }),
+            frameRate: 4,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'PR',
+            frames: this.anims.generateFrameNumbers('perso', { start: 0, end: 8 }),
+            frameRate: 4,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'PL',
+            frames: this.anims.generateFrameNumbers('perso', { start: 10, end: 18 }),
+            frameRate: 4,
+            repeat: -1
+        });
 
 
         this.anims.create({
@@ -4288,6 +4591,7 @@ class partie_3 extends Phaser.Scene {
                 this.canshootA1 = false
                 recharge = 1
                 this.sonBF.play();
+                this.sonBF.setVolume(0.1);
                 this.sonB.pause();
 
                 setTimeout(() => {
@@ -4318,6 +4622,8 @@ class partie_3 extends Phaser.Scene {
             cap1 = false
             rechargeJ = 1
             this.sonPropulsion.play();
+            this.sonPropulsion.setVolume(0.07);
+
             this.player.setVelocityY(-2000)
             setTimeout(() => {
                 this.player.setVelocityY(0)
@@ -4340,6 +4646,7 @@ class partie_3 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[0].x, this.tourelle.getChildren()[0].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[0].x).setVelocityY(this.player.y - this.tourelle.getChildren()[0].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[0].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[0].canshoot = true
                     }, 2500);
@@ -4354,6 +4661,7 @@ class partie_3 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[1].x, this.tourelle.getChildren()[1].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[1].x).setVelocityY(this.player.y - this.tourelle.getChildren()[1].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[1].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.canshoot2 = true
                     }, 1000);
@@ -4368,6 +4676,7 @@ class partie_3 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[2].x, this.tourelle.getChildren()[2].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[2].x).setVelocityY(this.player.y - this.tourelle.getChildren()[2].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[2].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[2].canshoot = true
                     }, 2000);
@@ -4382,6 +4691,7 @@ class partie_3 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[3].x, this.tourelle.getChildren()[3].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[3].x).setVelocityY(this.player.y - this.tourelle.getChildren()[3].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[3].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[3].canshoot = true
                     }, 2200);
@@ -4396,6 +4706,7 @@ class partie_3 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[4].x, this.tourelle.getChildren()[4].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[4].x).setVelocityY(this.player.y - this.tourelle.getChildren()[4].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[4].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[4].canshoot = true
                     }, 1900);
@@ -4435,6 +4746,8 @@ class partie_3 extends Phaser.Scene {
                 this.player.setVelocityX(-600);
                 if (this.player.body.velocity.y == 0) {
                     this.sonMarche.resume();
+                    this.player.anims.play('PL', true);
+
 
                 }
                 //this.HB.x=this.player.x-32;
@@ -4444,7 +4757,8 @@ class partie_3 extends Phaser.Scene {
                 this.player.setVelocityX(600);
                 if (this.player.body.velocity.y == 0) {
                     this.sonMarche.resume();
-                }
+                } this.player.anims.play('PR', true);
+
                 //this.HB.x=this.player.x+32;
                 //this.HB.y=this.player.y;
             }
@@ -4460,9 +4774,15 @@ class partie_3 extends Phaser.Scene {
 
             }
         }
+
+
+
+
+
         if (this.clavier.S.isDown) {
             this.player.setVelocityY(800);
         }
+
 
         if (this.player.body.velocity.y >= 900) {
             this.player.setVelocityY(800)
@@ -4489,7 +4809,7 @@ class partie_3 extends Phaser.Scene {
             this.jumpV.anims.play("jumpReloading", true);
         }
 
-    
+
         if (HP == 11) {
             this.vie.anims.play("HP11", true);
         }
@@ -4703,7 +5023,7 @@ class partie_3 extends Phaser.Scene {
     }
 
     ascenseur_1_move() {
-        if (this.clavier.E.isDown && this.ascenseur_1.body.velocity.x == 0 && this.generateur_3.vieGenerateur <=0) {
+        if (this.clavier.E.isDown && this.ascenseur_1.body.velocity.x == 0 && this.generateur_3.vieGenerateur <= 0) {
             this.ascenseur_1.setVelocityX(-400);
             setTimeout(() => {
                 this.ascenseur_1.setVelocityX(0);
@@ -4765,7 +5085,7 @@ class partie_3 extends Phaser.Scene {
         }
 
     }
-    
+
     phase4() {
         this.scene.start("partie_4")
     }
@@ -4778,6 +5098,7 @@ class partie_3 extends Phaser.Scene {
 
 }
 
+//////////////////////////////////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 class partie_4 extends Phaser.Scene {
     constructor() {
@@ -4789,8 +5110,7 @@ class partie_4 extends Phaser.Scene {
 
     preload() {
         this.load.tilemapTiledJSON("partie_4", "maps/partie_2.json");
-        this.load.image("phaser_assets", "maps/test.png");
-        this.load.image('perso', 'sprites/test_perso.png');
+        this.load.image("phaser_assets", "maps/tuile.png");
         this.load.image('ascensseur', 'maps/ascensseur.png');
         this.load.image('heal', 'sprites/heal.png');
         this.load.image('hb_ascensseur', 'maps/hb_ascensseur.png');
@@ -4801,11 +5121,12 @@ class partie_4 extends Phaser.Scene {
         this.load.image('porteS2', 'sprites/porte_simple_2.png');
         //this.load.image('TP1', 'maps/TP.png');
         this.load.image('MI', 'maps/murINV.png');
-        this.load.image('generateur', 'sprites/generateur.png');
         this.load.image('HBZM', 'sprites/hb_z_m.png');
         this.load.image('porteL', 'sprites/porte_lourd.png');
         this.load.image('lazzzzzer', 'sprites/lazzzzzer.png');
         this.load.image('tire_p_A_1', 'sprites/tire_p_A_1.png');
+        this.load.spritesheet('generateur', 'sprites/generateurA.png',
+            { frameWidth: 257, frameHeight: 320 });
         this.load.image('caisse', 'sprites/caisse.png');
         this.load.spritesheet('Loading', 'sprites/ecran_chargement.png',
             { frameWidth: 896, frameHeight: 448 });
@@ -4813,8 +5134,11 @@ class partie_4 extends Phaser.Scene {
             { frameWidth: 1300, frameHeight: 200 });
         this.load.spritesheet('surchauffe', 'sprites/surchauffe.png',
             { frameWidth: 30, frameHeight: 60 });
-        this.load.spritesheet('powerUP', 'sprites/powerUP.png',
+        this.load.spritesheet('powerU', 'sprites/powerUP.png',
             { frameWidth: 128, frameHeight: 128 });
+        this.load.spritesheet('perso', 'sprites/persoA.png',
+            { frameWidth: 192, frameHeight: 192 }); this.load.spritesheet('powerUP', 'sprites/powerUP.png',
+                { frameWidth: 128, frameHeight: 128 });
 
 
         this.load.setPath('sound');
@@ -4838,7 +5162,7 @@ class partie_4 extends Phaser.Scene {
 
         //input=this.input;
         const carteDuNiveau2 = this.add.tilemap("partie_4");
-        const tileset2 = carteDuNiveau2.addTilesetImage("test", "phaser_assets");
+        const tileset2 = carteDuNiveau2.addTilesetImage("tuile", "phaser_assets");
         const base1 = carteDuNiveau2.createLayer('base1', tileset2);
         base1.setCollisionByProperty({ estSolide: true });
         this.player = this.physics.add.sprite(56 * 64, 6 * 64, 'perso');
@@ -4857,10 +5181,11 @@ class partie_4 extends Phaser.Scene {
         this.jumpV.depth = 1000
         this.shieldV.depth = 1000
 
-        this.jumpV.visible = false;
 
         this.sonB.play();
+        this.sonB.setVolume(0.06);
         this.sonMarche.play();
+        this.sonMarche.setVolume(0.06);
         this.sonB.pause();
         this.sonMarche.pause();
         this.sonB.loop = true;
@@ -4891,6 +5216,8 @@ class partie_4 extends Phaser.Scene {
                 isLeftButtonDown = false;
                 this.sonB.pause();
                 this.sonBF.play();
+                this.sonBF.setVolume(0.1);
+
             }
         });
 
@@ -4902,10 +5229,10 @@ class partie_4 extends Phaser.Scene {
         //this.leftArm.play('gun-arm-idle');
         this.arme.body.allowGravity = false;
 
-      
+
 
         /////////////////////////////////MI\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-            this.MI_1 = this.physics.add.image(10 * 64, 6.5 * 64, 'MI')
+        this.MI_1 = this.physics.add.image(10 * 64, 6.5 * 64, 'MI')
             .setImmovable(true)
         this.MI_1.body.setAllowGravity(false);
         this.physics.add.collider(this.MI_1, this.player);
@@ -4933,7 +5260,7 @@ class partie_4 extends Phaser.Scene {
         this.physics.add.collider(this.ascenseur_2, this.HBA1);
         this.HBA1.body.allowGravity = true;
 
-    
+
         /////////////////////////////////COLISION\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
         this.physics.add.collider(this.tir_player, base1, this.destroylaser, null, this)
         this.physics.add.collider(this.player, this.tp, this.P2, null, this);
@@ -4948,6 +5275,54 @@ class partie_4 extends Phaser.Scene {
 
         /////////////////////////////////ANIM\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
+
+
+
+        this.anims.create({
+            key: 'G1',
+            frames: this.anims.generateFrameNumbers('generateur', { start: 0, end: 0 }),
+            frameRate: 4,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'G2',
+            frames: this.anims.generateFrameNumbers('generateur', { start: 1, end: 1 }),
+            frameRate: 4,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'G3',
+            frames: this.anims.generateFrameNumbers('generateur', { start: 2, end: 2 }),
+            frameRate: 4,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'G4',
+            frames: this.anims.generateFrameNumbers('generateur', { start: 3, end: 3 }),
+            frameRate: 4,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'idle',
+            frames: this.anims.generateFrameNumbers('perso', { start: 0, end: 0 }),
+            frameRate: 4,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'PR',
+            frames: this.anims.generateFrameNumbers('perso', { start: 0, end: 8 }),
+            frameRate: 4,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'PL',
+            frames: this.anims.generateFrameNumbers('perso', { start: 10, end: 18 }),
+            frameRate: 4,
+            repeat: -1
+        });
 
 
         this.anims.create({
@@ -5513,6 +5888,7 @@ class partie_4 extends Phaser.Scene {
                 this.canshootA1 = false
                 recharge = 1
                 this.sonBF.play();
+                this.sonBF.setVolume(0.1);
                 this.sonB.pause();
 
                 setTimeout(() => {
@@ -5543,6 +5919,8 @@ class partie_4 extends Phaser.Scene {
             cap1 = false
             rechargeJ = 1
             this.sonPropulsion.play();
+            this.sonPropulsion.setVolume(0.07);
+
             this.player.setVelocityY(-2000)
             setTimeout(() => {
                 this.player.setVelocityY(0)
@@ -5558,13 +5936,13 @@ class partie_4 extends Phaser.Scene {
 
         }
 
- 
+
         //if (this.clavier.E.isDown){
 
         //}
 
 
-        
+
 
 
 
@@ -5574,6 +5952,8 @@ class partie_4 extends Phaser.Scene {
                 this.player.setVelocityX(-600);
                 if (this.player.body.velocity.y == 0) {
                     this.sonMarche.resume();
+                    this.player.anims.play('PL', true);
+
 
                 }
                 //this.HB.x=this.player.x-32;
@@ -5583,7 +5963,8 @@ class partie_4 extends Phaser.Scene {
                 this.player.setVelocityX(600);
                 if (this.player.body.velocity.y == 0) {
                     this.sonMarche.resume();
-                }
+                } this.player.anims.play('PR', true);
+
                 //this.HB.x=this.player.x+32;
                 //this.HB.y=this.player.y;
             }
@@ -5599,9 +5980,15 @@ class partie_4 extends Phaser.Scene {
 
             }
         }
+
+
+
+
+
         if (this.clavier.S.isDown) {
             this.player.setVelocityY(800);
         }
+
 
         if (this.player.body.velocity.y >= 900) {
             this.player.setVelocityY(800)
@@ -5628,7 +6015,7 @@ class partie_4 extends Phaser.Scene {
             this.jumpV.anims.play("jumpReloading", true);
         }
 
-    
+
         if (HP == 11) {
             this.vie.anims.play("HP11", true);
         }
@@ -5842,7 +6229,7 @@ class partie_4 extends Phaser.Scene {
     }
 
     ascenseur_1_move() {
-        if (this.clavier.E.isDown && this.ascenseur_1.body.velocity.x == 0 && this.generateur_3.vieGenerateur <=0) {
+        if (this.clavier.E.isDown && this.ascenseur_1.body.velocity.x == 0 && this.generateur_3.vieGenerateur <= 0) {
             this.ascenseur_1.setVelocityX(-400);
             setTimeout(() => {
                 this.ascenseur_1.setVelocityX(0);
@@ -5865,12 +6252,7 @@ class partie_4 extends Phaser.Scene {
         HP -= 1
     }
 
-    sautPP() {
-        this.caisse_1.destroy()
-        cap1 = true
-        this.jumpV.visible = true;
 
-    }
 
     tourelleDegats(tir_player, tourelle) {
         tir_player.destroy()
@@ -5920,6 +6302,7 @@ class partie_4 extends Phaser.Scene {
 
 }
 
+//////////////////////////////////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 class partie_5 extends Phaser.Scene {
     constructor() {
         super('partie_5');
@@ -5930,8 +6313,7 @@ class partie_5 extends Phaser.Scene {
 
     preload() {
         this.load.tilemapTiledJSON("partie_5", "maps/partie_4.json");
-        this.load.image("phaser_assets", "maps/test.png");
-        this.load.image('perso', 'sprites/test_perso.png');
+        this.load.image("phaser_assets", "maps/tuile.png");
         this.load.image('ascensseur', 'maps/ascensseur.png');
         this.load.image('heal', 'sprites/heal.png');
         this.load.image('hb_ascensseur', 'maps/hb_ascensseur.png');
@@ -5942,11 +6324,12 @@ class partie_5 extends Phaser.Scene {
         this.load.image('porteS2', 'sprites/porte_simple_2.png');
         //this.load.image('TP1', 'maps/TP.png');
         this.load.image('MI', 'maps/murINV.png');
-        this.load.image('generateur', 'sprites/generateur.png');
         this.load.image('HBZM', 'sprites/hb_z_m.png');
         this.load.image('porteL', 'sprites/porte_lourd.png');
         this.load.image('lazzzzzer', 'sprites/lazzzzzer.png');
         this.load.image('tire_p_A_1', 'sprites/tire_p_A_1.png');
+        this.load.spritesheet('generateur', 'sprites/generateurA.png',
+            { frameWidth: 257, frameHeight: 320 });
         this.load.image('caisse', 'sprites/caisse.png');
         this.load.spritesheet('Loading', 'sprites/ecran_chargement.png',
             { frameWidth: 896, frameHeight: 448 });
@@ -5954,7 +6337,10 @@ class partie_5 extends Phaser.Scene {
             { frameWidth: 1300, frameHeight: 200 });
         this.load.spritesheet('surchauffe', 'sprites/surchauffe.png',
             { frameWidth: 30, frameHeight: 60 });
-        this.load.spritesheet('powerUP', 'sprites/powerUP.png')
+        this.load.spritesheet('powerU', 'sprites/powerUP.png',
+            { frameWidth: 128, frameHeight: 128 });
+        this.load.spritesheet('perso', 'sprites/persoA.png',
+            { frameWidth: 192, frameHeight: 192 }); this.load.spritesheet('powerUP', 'sprites/powerUP.png')
 
 
         this.load.setPath('sound');
@@ -5980,7 +6366,7 @@ class partie_5 extends Phaser.Scene {
 
         //input=this.input;
         const carteDuNiveau3 = this.add.tilemap("partie_5");
-        const tileset3 = carteDuNiveau3.addTilesetImage("test", "phaser_assets");
+        const tileset3 = carteDuNiveau3.addTilesetImage("tuile", "phaser_assets");
         const base3 = carteDuNiveau3.createLayer('base3', tileset3);
         base3.setCollisionByProperty({ estSolide: true });
         this.player = this.physics.add.sprite(14 * 64, 4 * 64, 'perso');
@@ -5999,10 +6385,12 @@ class partie_5 extends Phaser.Scene {
         this.jumpV.depth = 1000
         this.shieldV.depth = 1000
 
-        this.jumpV.visible = false;
+
 
         this.sonB.play();
+        this.sonB.setVolume(0.06);
         this.sonMarche.play();
+        this.sonMarche.setVolume(0.06);
         this.sonB.pause();
         this.sonMarche.pause();
         this.sonB.loop = true;
@@ -6033,6 +6421,7 @@ class partie_5 extends Phaser.Scene {
                 isLeftButtonDown = false;
                 this.sonB.pause();
                 this.sonBF.play();
+                this.sonBF.setVolume(0.1);
             }
         });
 
@@ -6226,14 +6615,14 @@ class partie_5 extends Phaser.Scene {
         this.generateur_4.vieGenerateur = 20;
 
         this.generateur_5 = this.physics.add.image(111 * 64, 127.5 * 64, 'generateur')
-        .setImmovable(true)
+            .setImmovable(true)
         this.generateur_5.depth = 1
         this.generateur_5.body.setAllowGravity(false);
         this.physics.add.collider(this.generateur_5, this.player);
         this.generateur_5.vieGenerateur = 20;
 
         this.generateur_6 = this.physics.add.image(23 * 64, 142.5 * 64, 'generateur')
-        .setImmovable(true)
+            .setImmovable(true)
         this.generateur_6.depth = 1
         this.generateur_6.body.setAllowGravity(false);
         this.physics.add.collider(this.generateur_6, this.player);
@@ -6301,6 +6690,54 @@ class partie_5 extends Phaser.Scene {
 
         /////////////////////////////////ANIM\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
+
+
+
+        this.anims.create({
+            key: 'G1',
+            frames: this.anims.generateFrameNumbers('generateur', { start: 0, end: 0 }),
+            frameRate: 4,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'G2',
+            frames: this.anims.generateFrameNumbers('generateur', { start: 1, end: 1 }),
+            frameRate: 4,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'G3',
+            frames: this.anims.generateFrameNumbers('generateur', { start: 2, end: 2 }),
+            frameRate: 4,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'G4',
+            frames: this.anims.generateFrameNumbers('generateur', { start: 3, end: 3 }),
+            frameRate: 4,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'idle',
+            frames: this.anims.generateFrameNumbers('perso', { start: 0, end: 0 }),
+            frameRate: 4,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'PR',
+            frames: this.anims.generateFrameNumbers('perso', { start: 0, end: 8 }),
+            frameRate: 4,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'PL',
+            frames: this.anims.generateFrameNumbers('perso', { start: 10, end: 18 }),
+            frameRate: 4,
+            repeat: -1
+        });
 
 
         this.anims.create({
@@ -6818,7 +7255,7 @@ class partie_5 extends Phaser.Scene {
         //setTimeout(() => {
         //    this.load.destroy()
         //    this.clavier.enabled = true;
-//
+        //
         //}, 5000);
 
     }
@@ -6866,6 +7303,7 @@ class partie_5 extends Phaser.Scene {
                 this.canshootA1 = false
                 recharge = 1
                 this.sonBF.play();
+                this.sonBF.setVolume(0.1);
                 this.sonB.pause();
 
                 setTimeout(() => {
@@ -6896,6 +7334,8 @@ class partie_5 extends Phaser.Scene {
             cap1 = false
             rechargeJ = 1
             this.sonPropulsion.play();
+            this.sonPropulsion.setVolume(0.07);
+
             this.player.setVelocityY(-2000)
             setTimeout(() => {
                 this.player.setVelocityY(0)
@@ -6915,7 +7355,7 @@ class partie_5 extends Phaser.Scene {
             }, 5000);
         }
 
-        if (this.generateur_2.vieGenerateur <= 0 && this.generateur_3.vieGenerateur <= 0 && this.generateur_4.vieGenerateur <= 0 && this.generateur_5.vieGenerateur <= 0 && this.generateur_6.vieGenerateur <= 0 ) {
+        if (this.generateur_2.vieGenerateur <= 0 && this.generateur_3.vieGenerateur <= 0 && this.generateur_4.vieGenerateur <= 0 && this.generateur_5.vieGenerateur <= 0 && this.generateur_6.vieGenerateur <= 0) {
             setTimeout(() => {
                 this.porte_2.destroy()
             }, 5000);
@@ -6930,6 +7370,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[0].x, this.tourelle.getChildren()[0].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[0].x).setVelocityY(this.player.y - this.tourelle.getChildren()[0].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[0].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[0].canshoot = true
                     }, 2500);
@@ -6944,6 +7385,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[1].x, this.tourelle.getChildren()[1].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[1].x).setVelocityY(this.player.y - this.tourelle.getChildren()[1].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[1].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.canshoot2 = true
                     }, 1000);
@@ -6958,6 +7400,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[2].x, this.tourelle.getChildren()[2].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[2].x).setVelocityY(this.player.y - this.tourelle.getChildren()[2].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[2].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[2].canshoot = true
                     }, 2000);
@@ -6972,6 +7415,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[3].x, this.tourelle.getChildren()[3].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[3].x).setVelocityY(this.player.y - this.tourelle.getChildren()[3].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[3].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[3].canshoot = true
                     }, 2200);
@@ -6986,6 +7430,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[4].x, this.tourelle.getChildren()[4].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[4].x).setVelocityY(this.player.y - this.tourelle.getChildren()[4].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[4].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[4].canshoot = true
                     }, 1900);
@@ -7000,6 +7445,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[5].x, this.tourelle.getChildren()[5].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[5].x).setVelocityY(this.player.y - this.tourelle.getChildren()[5].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[5].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[5].canshoot = true
                     }, 1900);
@@ -7014,6 +7460,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[6].x, this.tourelle.getChildren()[6].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[6].x).setVelocityY(this.player.y - this.tourelle.getChildren()[6].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[6].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[6].canshoot = true
                     }, 1900);
@@ -7028,6 +7475,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[7].x, this.tourelle.getChildren()[7].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[7].x).setVelocityY(this.player.y - this.tourelle.getChildren()[7].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[7].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[7].canshoot = true
                     }, 1900);
@@ -7042,6 +7490,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[8].x, this.tourelle.getChildren()[8].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[8].x).setVelocityY(this.player.y - this.tourelle.getChildren()[8].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[8].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[8].canshoot = true
                     }, 1900);
@@ -7056,6 +7505,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[9].x, this.tourelle.getChildren()[9].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[9].x).setVelocityY(this.player.y - this.tourelle.getChildren()[9].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[9].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[9].canshoot = true
                     }, 1900);
@@ -7070,6 +7520,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[10].x, this.tourelle.getChildren()[10].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[10].x).setVelocityY(this.player.y - this.tourelle.getChildren()[10].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[10].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[10].canshoot = true
                     }, 1900);
@@ -7084,6 +7535,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[11].x, this.tourelle.getChildren()[11].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[11].x).setVelocityY(this.player.y - this.tourelle.getChildren()[11].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[11].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[11].canshoot = true
                     }, 1900);
@@ -7098,6 +7550,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[12].x, this.tourelle.getChildren()[12].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[12].x).setVelocityY(this.player.y - this.tourelle.getChildren()[12].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[12].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[12].canshoot = true
                     }, 1900);
@@ -7112,6 +7565,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[13].x, this.tourelle.getChildren()[13].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[13].x).setVelocityY(this.player.y - this.tourelle.getChildren()[13].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[13].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[13].canshoot = true
                     }, 1900);
@@ -7126,6 +7580,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[14].x, this.tourelle.getChildren()[14].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[14].x).setVelocityY(this.player.y - this.tourelle.getChildren()[14].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[14].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[14].canshoot = true
                     }, 1900);
@@ -7140,6 +7595,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[15].x, this.tourelle.getChildren()[15].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[15].x).setVelocityY(this.player.y - this.tourelle.getChildren()[15].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[15].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[15].canshoot = true
                     }, 1900);
@@ -7154,6 +7610,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[16].x, this.tourelle.getChildren()[16].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[16].x).setVelocityY(this.player.y - this.tourelle.getChildren()[16].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[16].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[16].canshoot = true
                     }, 1900);
@@ -7168,6 +7625,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[17].x, this.tourelle.getChildren()[17].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[17].x).setVelocityY(this.player.y - this.tourelle.getChildren()[17].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[17].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[17].canshoot = true
                     }, 1900);
@@ -7182,6 +7640,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[18].x, this.tourelle.getChildren()[18].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[18].x).setVelocityY(this.player.y - this.tourelle.getChildren()[18].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[18].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[18].canshoot = true
                     }, 1900);
@@ -7196,6 +7655,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[19].x, this.tourelle.getChildren()[19].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[19].x).setVelocityY(this.player.y - this.tourelle.getChildren()[19].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[19].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[19].canshoot = true
                     }, 1900);
@@ -7210,6 +7670,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[20].x, this.tourelle.getChildren()[20].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[20].x).setVelocityY(this.player.y - this.tourelle.getChildren()[20].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[20].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[20].canshoot = true
                     }, 1900);
@@ -7224,6 +7685,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[21].x, this.tourelle.getChildren()[21].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[21].x).setVelocityY(this.player.y - this.tourelle.getChildren()[21].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[21].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[21].canshoot = true
                     }, 1900);
@@ -7238,6 +7700,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[22].x, this.tourelle.getChildren()[22].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[22].x).setVelocityY(this.player.y - this.tourelle.getChildren()[22].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[22].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[22].canshoot = true
                     }, 1900);
@@ -7252,6 +7715,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[23].x, this.tourelle.getChildren()[23].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[23].x).setVelocityY(this.player.y - this.tourelle.getChildren()[23].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[23].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[23].canshoot = true
                     }, 1900);
@@ -7266,6 +7730,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[24].x, this.tourelle.getChildren()[24].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[24].x).setVelocityY(this.player.y - this.tourelle.getChildren()[24].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[24].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[24].canshoot = true
                     }, 1900);
@@ -7280,6 +7745,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[25].x, this.tourelle.getChildren()[25].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[25].x).setVelocityY(this.player.y - this.tourelle.getChildren()[25].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[25].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[25].canshoot = true
                     }, 1900);
@@ -7294,6 +7760,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[26].x, this.tourelle.getChildren()[26].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[26].x).setVelocityY(this.player.y - this.tourelle.getChildren()[26].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[26].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[26].canshoot = true
                     }, 1900);
@@ -7308,6 +7775,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[27].x, this.tourelle.getChildren()[27].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[27].x).setVelocityY(this.player.y - this.tourelle.getChildren()[27].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[27].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[27].canshoot = true
                     }, 1900);
@@ -7322,6 +7790,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[28].x, this.tourelle.getChildren()[28].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[28].x).setVelocityY(this.player.y - this.tourelle.getChildren()[28].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[28].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[28].canshoot = true
                     }, 1900);
@@ -7336,6 +7805,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[29].x, this.tourelle.getChildren()[29].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[29].x).setVelocityY(this.player.y - this.tourelle.getChildren()[29].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[29].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[29].canshoot = true
                     }, 1900);
@@ -7350,6 +7820,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[30].x, this.tourelle.getChildren()[30].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[30].x).setVelocityY(this.player.y - this.tourelle.getChildren()[30].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[30].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[30].canshoot = true
                     }, 1900);
@@ -7364,6 +7835,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[31].x, this.tourelle.getChildren()[31].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[31].x).setVelocityY(this.player.y - this.tourelle.getChildren()[31].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[31].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[31].canshoot = true
                     }, 1900);
@@ -7378,6 +7850,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[32].x, this.tourelle.getChildren()[32].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[32].x).setVelocityY(this.player.y - this.tourelle.getChildren()[32].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[32].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[32].canshoot = true
                     }, 1900);
@@ -7392,6 +7865,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[33].x, this.tourelle.getChildren()[33].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[33].x).setVelocityY(this.player.y - this.tourelle.getChildren()[33].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[33].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[33].canshoot = true
                     }, 1900);
@@ -7406,6 +7880,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[34].x, this.tourelle.getChildren()[34].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[34].x).setVelocityY(this.player.y - this.tourelle.getChildren()[34].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[34].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[34].canshoot = true
                     }, 1900);
@@ -7420,6 +7895,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[35].x, this.tourelle.getChildren()[35].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[35].x).setVelocityY(this.player.y - this.tourelle.getChildren()[35].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[35].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[35].canshoot = true
                     }, 1900);
@@ -7434,6 +7910,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[36].x, this.tourelle.getChildren()[36].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[36].x).setVelocityY(this.player.y - this.tourelle.getChildren()[36].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[36].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[36].canshoot = true
                     }, 1900);
@@ -7448,6 +7925,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[37].x, this.tourelle.getChildren()[37].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[37].x).setVelocityY(this.player.y - this.tourelle.getChildren()[37].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[37].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[37].canshoot = true
                     }, 1900);
@@ -7462,6 +7940,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[38].x, this.tourelle.getChildren()[38].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[38].x).setVelocityY(this.player.y - this.tourelle.getChildren()[38].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[38].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[38].canshoot = true
                     }, 1900);
@@ -7476,6 +7955,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[39].x, this.tourelle.getChildren()[39].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[39].x).setVelocityY(this.player.y - this.tourelle.getChildren()[39].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[39].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[39].canshoot = true
                     }, 1900);
@@ -7490,6 +7970,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[40].x, this.tourelle.getChildren()[40].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[40].x).setVelocityY(this.player.y - this.tourelle.getChildren()[40].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[40].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[40].canshoot = true
                     }, 1900);
@@ -7504,6 +7985,7 @@ class partie_5 extends Phaser.Scene {
                     this.projectile_tourelle.create(this.tourelle.getChildren()[41].x, this.tourelle.getChildren()[41].y, "lazzzzzer").setVelocityX(this.player.x - this.tourelle.getChildren()[41].x).setVelocityY(this.player.y - this.tourelle.getChildren()[41].y).body.setAllowGravity(false)
                     this.tourelle.getChildren()[41].canshoot = false
                     this.sonTT.play();
+                    this.sonTT.setVolume(0.09);
                     setTimeout(() => {
                         this.tourelle.getChildren()[41].canshoot = true
                     }, 1900);
@@ -7542,6 +8024,8 @@ class partie_5 extends Phaser.Scene {
                 this.player.setVelocityX(-600);
                 if (this.player.body.velocity.y == 0) {
                     this.sonMarche.resume();
+                    this.player.anims.play('PL', true);
+
 
                 }
                 //this.HB.x=this.player.x-32;
@@ -7551,7 +8035,8 @@ class partie_5 extends Phaser.Scene {
                 this.player.setVelocityX(600);
                 if (this.player.body.velocity.y == 0) {
                     this.sonMarche.resume();
-                }
+                } this.player.anims.play('PR', true);
+
                 //this.HB.x=this.player.x+32;
                 //this.HB.y=this.player.y;
             }
@@ -7567,9 +8052,15 @@ class partie_5 extends Phaser.Scene {
 
             }
         }
+
+
+
+
+
         if (this.clavier.S.isDown) {
             this.player.setVelocityY(800);
         }
+
 
         if (this.player.body.velocity.y >= 900) {
             this.player.setVelocityY(800)
@@ -7596,7 +8087,7 @@ class partie_5 extends Phaser.Scene {
             this.jumpV.anims.play("jumpReloading", true);
         }
 
-    
+
         if (HP == 11) {
             this.vie.anims.play("HP11", true);
         }
@@ -7810,7 +8301,7 @@ class partie_5 extends Phaser.Scene {
     }
 
     ascenseur_1_move() {
-        if (this.clavier.E.isDown && this.ascenseur_1.body.velocity.x == 0 && this.generateur_3.vieGenerateur <=0) {
+        if (this.clavier.E.isDown && this.ascenseur_1.body.velocity.x == 0 && this.generateur_3.vieGenerateur <= 0) {
             this.ascenseur_1.setVelocityX(-400);
             setTimeout(() => {
                 this.ascenseur_1.setVelocityX(0);
@@ -7833,12 +8324,7 @@ class partie_5 extends Phaser.Scene {
         HP -= 1
     }
 
-    sautPP() {
-        this.caisse_1.destroy()
-        cap1 = true
-        this.jumpV.visible = true;
 
-    }
 
     tourelleDegats(tir_player, tourelle) {
         tir_player.destroy()
